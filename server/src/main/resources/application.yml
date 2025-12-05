@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: workhub
+
+  profiles:
+    active: local
+
+  datasource:
+    url: ${env.DB_URL}
+    username: ${env.DB_USER}
+    password: ${env.DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: ${env.JWT_SECRET}
+
+env:
+  printer:
+    enabled: false
