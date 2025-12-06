@@ -1,14 +1,17 @@
 package com.incial.workhub.dto;
 
+import com.incial.workhub.enums.USER_ROLE;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Email is required")
+    private String name;
+
     private String email;
 
-    @NotBlank(message = "Password is required")
     private String password;
+
+    private USER_ROLE role;
 }

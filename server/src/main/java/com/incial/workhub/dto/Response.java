@@ -11,6 +11,13 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response {
 
+    //error handling
+    private int statusCode;
+    private String message;
+
+    private String role;
+    private String token;
+
     //CRM
     private String company;
     private String phone;
