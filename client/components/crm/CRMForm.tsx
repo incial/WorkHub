@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Edit2, User, Phone, Mail, Calendar, Briefcase, FileText, Tag, DollarSign, CheckCircle, Clock, AlertCircle, History } from 'lucide-react';
+import { X, Save, Edit2, User, Phone, Mail, Calendar, Briefcase, FileText, Tag, DollarSign, CheckCircle, Clock, AlertCircle, History, ExternalLink, HardDrive } from 'lucide-react';
 import { CRMEntry } from '../../types';
 import { getStatusStyles, formatDate, getFollowUpColor, formatMoney } from '../../utils';
 import { CustomDatePicker } from '../ui/CustomDatePicker';
@@ -73,6 +73,7 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                 tags: [],
                 work: [],
                 leadSources: [],
+                driveLink: '',
                 lastContact: new Date().toISOString().split('T')[0],
                 nextFollowUp: new Date().toISOString().split('T')[0],
                 notes: '',
@@ -243,7 +244,7 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                     </div>
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <p className="text-xs font-semibold text-gray-400 mb-2">Tags</p>
                     <div className="flex flex-wrap gap-2">
                         {formData.tags && formData.tags.length > 0 ? (
@@ -258,6 +259,21 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                         ) : <span className="text-sm text-gray-400 italic">No tags</span>}
                     </div>
                 </div>
+
+                {formData.driveLink && (
+                    <div className="pt-3 border-t border-gray-100">
+                        <a 
+                            href={formData.driveLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 -mx-2 rounded-lg transition-colors"
+                        >
+                            <HardDrive className="h-4 w-4" />
+                            Open Project Assets
+                            <ExternalLink className="h-3 w-3 opacity-50" />
+                        </a>
+                    </div>
+                )}
             </div>
         </div>
 
@@ -340,6 +356,7 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                             <option value="on progress">On Progress</option>
                             <option value="Quote Sent">Quote Sent</option>
                             <option value="onboarded">Onboarded</option>
+                            <option value="completed">Completed</option>
                             <option value="drop">Drop</option>
                         </select>
                     </div>
@@ -389,6 +406,20 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                             placeholder="Select Date"
                         />
                     </div>
+               </div>
+               
+               {/* Drive Link Input */}
+               <div className="w-full">
+                  <label className="block mb-1.5 text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <HardDrive className="h-3.5 w-3.5 text-gray-500" /> Google Drive Link
+                  </label>
+                  <input 
+                    type="url" 
+                    placeholder="https://drive.google.com/..."
+                    className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 focus:outline-none" 
+                    value={formData.driveLink || ''} 
+                    onChange={e => setFormData({...formData, driveLink: e.target.value})} 
+                  />
                </div>
             </div>
         </div>

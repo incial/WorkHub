@@ -4,15 +4,18 @@ import { Navbar } from '../components/layout/Navbar';
 import { Sidebar } from '../components/layout/Sidebar';
 import { CompaniesTable } from '../components/companies/CompaniesTable';
 import { CompaniesFilters } from '../components/companies/CompaniesFilters';
+import { CompanyDetailsModal } from '../components/companies/CompanyDetailsModal';
 import { Company, CompanyFilterState, CRMEntry } from '../types';
-import { Briefcase, Building, Archive, ArrowRight } from 'lucide-react';
+import { Briefcase, Building, Archive, ArrowRight, CheckCircle } from 'lucide-react';
 import { crmApi } from '../services/api';
 import { Link } from 'react-router-dom';
 
 export const CompaniesPage: React.FC = () => {
   const [crmEntries, setCrmEntries] = useState<CRMEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'active' | 'dropped'>('active');
+  const [activeTab, setActiveTab] = useState<'active' | 'dropped' | 'past'>('active');
+  const [viewingCompany, setViewingCompany] = useState<Company | undefined>(undefined);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [filters, setFilters] = useState<CompanyFilterState>({
     search: '',
@@ -44,28 +47,36 @@ export const CompaniesPage: React.FC = () => {
           // Generate Reference ID: REF-{Year}-{ID}
           referenceId: `REF-${new Date().getFullYear()}-${entry.id.toString().padStart(3, '0')}`,
           name: entry.company,
+          contactPerson: entry.contactName, // Map contact name
           work: entry.work.map((w: any) => typeof w === 'object' ? w.name : w),
           status: entry.status,
           createdAt: entry.lastContact,
           updatedAt: entry.lastUpdatedAt || new Date().toISOString(),
+          lastUpdatedBy: entry.lastUpdatedBy,
+          lastUpdatedAt: entry.lastUpdatedAt,
+          driveLink: entry.driveLink // Map Drive Link
           // Use properties from CRM that map to Company interface
       } as Company));
   }, [crmEntries]);
 
-  // Separate into Active and Dropped
+  // Separate into Active, Dropped, and Past
   const categorizedData = useMemo(() => {
-      const active = transformedData.filter(c => c.status !== 'drop');
+      const active = transformedData.filter(c => c.status !== 'drop' && c.status !== 'completed');
       const dropped = transformedData.filter(c => c.status === 'drop');
-      return { active, dropped };
+      const past = transformedData.filter(c => c.status === 'completed');
+      return { active, dropped, past };
   }, [transformedData]);
 
   // Filtering & Sorting
   const displayData = useMemo(() => {
-    const sourceList = activeTab === 'active' ? categorizedData.active : categorizedData.dropped;
+    let sourceList = categorizedData.active;
+    if (activeTab === 'dropped') sourceList = categorizedData.dropped;
+    if (activeTab === 'past') sourceList = categorizedData.past;
 
     let result = sourceList.filter(item => {
       const matchesSearch = filters.search === '' || 
         item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+        (item.contactPerson && item.contactPerson.toLowerCase().includes(filters.search.toLowerCase())) ||
         item.referenceId.toLowerCase().includes(filters.search.toLowerCase());
       
       const matchesStatus = filters.status === '' || item.status === filters.status;
@@ -78,13 +89,13 @@ export const CompaniesPage: React.FC = () => {
     return result.sort((a, b) => b.id - a.id);
   }, [categorizedData, activeTab, filters]);
 
-  // Handle Edit - Redirect to CRM since that is the source of truth
   const handleEdit = (company: Company) => {
-      // We could open a modal here, but for this architecture, we might want to direct them to CRM
-      // For now, I'll just log it or we could reuse the CRM modal if imported. 
-      // Given the request, "CRM dashboard contains every company in full details", 
-      // let's keep the Companies view read-only or simple status updates if requested later.
       console.log("Edit requested for", company.name); 
+  };
+
+  const handleView = (company: Company) => {
+      setViewingCompany(company);
+      setIsModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -101,6 +112,15 @@ export const CompaniesPage: React.FC = () => {
       }
   };
 
+  const getTabLabel = () => {
+      switch(activeTab) {
+          case 'active': return 'active';
+          case 'dropped': return 'dropped';
+          case 'past': return 'past work';
+          default: return 'records';
+      }
+  }
+
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
       <Sidebar />
@@ -116,7 +136,7 @@ export const CompaniesPage: React.FC = () => {
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Companies Registry</h1>
-                    <p className="text-gray-500 mt-1 font-medium">Unified directory of all active and dropped accounts.</p>
+                    <p className="text-gray-500 mt-1 font-medium">Unified directory of all active accounts and past projects.</p>
                 </div>
             </div>
             <div className="flex gap-3">
@@ -132,10 +152,10 @@ export const CompaniesPage: React.FC = () => {
           <div className="bg-white rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100/50 flex flex-col flex-1 overflow-hidden">
             
             {/* Tabs */}
-            <div className="flex items-center gap-1 p-2 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex items-center gap-1 p-2 border-b border-gray-100 bg-gray-50/50 overflow-x-auto">
                 <button 
                     onClick={() => setActiveTab('active')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                         activeTab === 'active' 
                         ? 'bg-white text-brand-600 shadow-sm ring-1 ring-gray-200' 
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
@@ -148,8 +168,22 @@ export const CompaniesPage: React.FC = () => {
                     </span>
                 </button>
                 <button 
+                    onClick={() => setActiveTab('past')}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                        activeTab === 'past' 
+                        ? 'bg-white text-purple-600 shadow-sm ring-1 ring-gray-200' 
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
+                    }`}
+                >
+                    <CheckCircle className="h-4 w-4" />
+                    Past Works
+                    <span className="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-md text-xs border border-purple-100 ml-1">
+                        {categorizedData.past.length}
+                    </span>
+                </button>
+                <button 
                     onClick={() => setActiveTab('dropped')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                         activeTab === 'dropped' 
                         ? 'bg-white text-red-600 shadow-sm ring-1 ring-gray-200' 
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
@@ -170,18 +204,25 @@ export const CompaniesPage: React.FC = () => {
                     data={displayData} 
                     isLoading={isLoading} 
                     onEdit={handleEdit}
+                    onView={handleView}
                     onDelete={handleDelete}
                 />
             </div>
             
             <div className="p-4 border-t border-gray-50 bg-white text-xs font-medium text-gray-400 flex justify-between">
                 <span>
-                    Showing {displayData.length} {activeTab === 'active' ? 'active' : 'dropped'} records
+                    Showing {displayData.length} {getTabLabel()} records
                 </span>
                 <span>Synced with CRM</span>
             </div>
           </div>
         </main>
+
+        <CompanyDetailsModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            company={viewingCompany}
+        />
       </div>
     </div>
   );

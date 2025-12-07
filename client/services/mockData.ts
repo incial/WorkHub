@@ -17,6 +17,7 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     tags: ["Follow-up", "VIP"],
     work: ["branding", "marketing"],
     leadSources: ["Google Business"],
+    driveLink: "https://drive.google.com/drive/folders/sample-project-id",
     lastUpdatedBy: "Vallapata",
     lastUpdatedAt: "2023-10-26T10:00:00Z"
   },
@@ -102,7 +103,9 @@ export const MOCK_COMPANIES_DATA: Company[] = [
     work: ["Marketing", "Branding"],
     status: "running",
     createdAt: "2023-01-15T10:00:00Z",
-    updatedAt: "2023-10-01T14:00:00Z"
+    updatedAt: "2023-10-01T14:00:00Z",
+    lastUpdatedBy: "Demo User",
+    lastUpdatedAt: "2023-10-01T14:00:00Z"
   },
   {
     id: 2,
@@ -111,7 +114,9 @@ export const MOCK_COMPANIES_DATA: Company[] = [
     work: ["UI/UX", "Website"],
     status: "not_started",
     createdAt: "2023-02-20T09:30:00Z",
-    updatedAt: "2023-02-20T09:30:00Z"
+    updatedAt: "2023-02-20T09:30:00Z",
+    lastUpdatedBy: "John Doe",
+    lastUpdatedAt: "2023-02-20T09:30:00Z"
   },
   {
     id: 3,
@@ -120,7 +125,9 @@ export const MOCK_COMPANIES_DATA: Company[] = [
     work: ["Video", "VFX"],
     status: "completed",
     createdAt: "2022-11-05T16:20:00Z",
-    updatedAt: "2023-09-15T11:45:00Z"
+    updatedAt: "2023-09-15T11:45:00Z",
+    lastUpdatedBy: "Vallapata",
+    lastUpdatedAt: "2023-09-15T11:45:00Z"
   },
   {
     id: 4,
@@ -129,7 +136,9 @@ export const MOCK_COMPANIES_DATA: Company[] = [
     work: ["Ads", "Poster"],
     status: "discontinued",
     createdAt: "2023-05-12T08:00:00Z",
-    updatedAt: "2023-06-01T10:00:00Z"
+    updatedAt: "2023-06-01T10:00:00Z",
+    lastUpdatedBy: "Vallapata",
+    lastUpdatedAt: "2023-06-01T10:00:00Z"
   },
   {
     id: 5,
@@ -138,7 +147,9 @@ export const MOCK_COMPANIES_DATA: Company[] = [
     work: ["LinkedIn", "Marketing"],
     status: "running",
     createdAt: "2023-08-10T13:15:00Z",
-    updatedAt: "2023-10-25T09:00:00Z"
+    updatedAt: "2023-10-25T09:00:00Z",
+    lastUpdatedBy: "Demo User",
+    lastUpdatedAt: "2023-10-25T09:00:00Z"
   }
 ];
 
@@ -151,7 +162,9 @@ export const MOCK_TASKS_DATA: Task[] = [
     priority: "High",
     assignedTo: "Vallapata",
     dueDate: new Date().toISOString().split('T')[0], // Today
-    createdAt: "2023-10-20T10:00:00Z"
+    createdAt: "2023-10-20T10:00:00Z",
+    lastUpdatedBy: "Vallapata",
+    lastUpdatedAt: "2023-10-20T12:00:00Z"
   },
   {
     id: 2,
@@ -161,7 +174,9 @@ export const MOCK_TASKS_DATA: Task[] = [
     priority: "Medium",
     assignedTo: "John Doe",
     dueDate: "2023-11-05",
-    createdAt: "2023-10-21T11:00:00Z"
+    createdAt: "2023-10-21T11:00:00Z",
+    lastUpdatedBy: "John Doe",
+    lastUpdatedAt: "2023-10-21T11:30:00Z"
   },
   {
     id: 3,
@@ -171,7 +186,9 @@ export const MOCK_TASKS_DATA: Task[] = [
     priority: "Low",
     assignedTo: "Vallapata",
     dueDate: "2023-10-15",
-    createdAt: "2023-10-01T09:00:00Z"
+    createdAt: "2023-10-01T09:00:00Z",
+    lastUpdatedBy: "Vallapata",
+    lastUpdatedAt: "2023-10-15T15:45:00Z"
   },
   {
     id: 4,
@@ -181,7 +198,9 @@ export const MOCK_TASKS_DATA: Task[] = [
     priority: "High",
     assignedTo: "Demo User",
     dueDate: "2023-11-01",
-    createdAt: "2023-10-25T14:00:00Z"
+    createdAt: "2023-10-25T14:00:00Z",
+    lastUpdatedBy: "Demo User",
+    lastUpdatedAt: "2023-10-25T14:10:00Z"
   },
   {
     id: 5,
@@ -191,6 +210,8 @@ export const MOCK_TASKS_DATA: Task[] = [
     priority: "Medium",
     assignedTo: "Demo User",
     dueDate: new Date().toISOString().split('T')[0],
-    createdAt: "2023-10-26T08:30:00Z"
+    createdAt: "2023-10-26T08:30:00Z",
+    lastUpdatedBy: "Demo User",
+    lastUpdatedAt: "2023-10-26T08:30:00Z"
   }
 ];

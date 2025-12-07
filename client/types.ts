@@ -1,5 +1,5 @@
 
-export type CRMStatus = 'onboarded' | 'drop' | 'on progress' | 'Quote Sent' | 'lead';
+export type CRMStatus = 'onboarded' | 'drop' | 'on progress' | 'Quote Sent' | 'lead' | 'completed';
 
 export interface User {
   id: number;
@@ -31,6 +31,7 @@ export interface CRMEntry {
   tags: string[];
   work: string[];
   leadSources: string[];
+  driveLink?: string; // New field
   lastUpdatedBy?: string;
   lastUpdatedAt?: string;
 }
@@ -51,13 +52,15 @@ export interface Company {
   id: number;
   referenceId: string;
   name: string;
+  contactPerson?: string; 
   work: string[];
   status: CompanyStatus;
   createdAt: string;
   updatedAt: string;
   lastUpdatedBy?: string;
   lastUpdatedAt?: string;
-  isCrmDerived?: boolean; // New field to identify if it came from CRM
+  driveLink?: string; // New field
+  isCrmDerived?: boolean; 
 }
 
 export interface CompanyFilterState {
