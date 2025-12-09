@@ -1,6 +1,4 @@
 
-
-
 import { CRMEntry, Task, Meeting } from '../types';
 
 export const MOCK_CRM_DATA: CRMEntry[] = [
@@ -11,6 +9,8 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "anil@stmarysrubbers.com",
     contactName: "Anil Michael",
     assignedTo: "Vallapata",
+    address: "Kinfra Industrial Park, Thumba, Trivandrum, Kerala",
+    companyImageUrl: "https://ui-avatars.com/api/?name=SMR+Rubbers&background=0D8ABC&color=fff&size=128", // Sample
     lastContact: "2023-10-25",
     nextFollowUp: new Date().toISOString().split('T')[0], // Today
     dealValue: 35000.00,
@@ -37,6 +37,8 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "sarah@techflow.io",
     contactName: "Sarah Connor",
     assignedTo: "John Doe",
+    address: "123 Innovation Dr, Silicon Valley, CA 94025",
+    companyImageUrl: "https://ui-avatars.com/api/?name=TechFlow&background=6366f1&color=fff&size=128",
     lastContact: "2023-10-20",
     nextFollowUp: "2023-10-24", // Past
     dealValue: 120000.00,
@@ -60,6 +62,7 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "info@greenearth.org",
     contactName: "David Green",
     assignedTo: "Vallapata",
+    address: "45 Eco Way, Portland, OR 97204",
     lastContact: "2023-10-28",
     nextFollowUp: "2025-11-01", // Future
     dealValue: 15000.00,
@@ -84,6 +87,7 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "contact@nebula.com",
     contactName: "Nebula Stark",
     assignedTo: "John Doe",
+    address: "888 Space Center Blvd, Houston, TX 77058",
     lastContact: "2023-09-15",
     nextFollowUp: "2023-09-20", // Past
     dealValue: 5000.00,
@@ -102,6 +106,7 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "ops@alphalog.com",
     contactName: "Mike Ross",
     assignedTo: "Vallapata",
+    address: "Port Authority Bldg, Suite 400, New York, NY 10018",
     lastContact: "2023-10-29",
     nextFollowUp: "2025-10-30",
     dealValue: 75000.00,
@@ -192,6 +197,7 @@ export const MOCK_CRM_DATA: CRMEntry[] = [
     email: "info@apexbuilds.com",
     contactName: "Robert Apex",
     assignedTo: "Vallapata",
+    address: "500 Builder Ave, Chicago, IL 60601",
     lastContact: "2023-09-30",
     nextFollowUp: "2024-09-30",
     dealValue: 85000.00,

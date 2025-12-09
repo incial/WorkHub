@@ -1,16 +1,17 @@
 
 import React from 'react';
-import { X, Hash, User, Calendar, Tag, Clock, ExternalLink, HardDrive, Linkedin, Instagram, Facebook, Twitter, Globe, Link as LinkIcon } from 'lucide-react';
+import { X, Hash, User, Calendar, Tag, Clock, ExternalLink, HardDrive, Linkedin, Instagram, Facebook, Twitter, Globe, Link as LinkIcon, Edit2 } from 'lucide-react';
 import { CRMEntry } from '../../types';
 import { getCompanyStatusStyles, getWorkTypeStyles, formatDate } from '../../utils';
 
 interface CompanyDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onEdit?: (company: CRMEntry) => void;
   company?: CRMEntry;
 }
 
-export const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({ isOpen, onClose, company }) => {
+export const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({ isOpen, onClose, onEdit, company }) => {
   if (!isOpen || !company) return null;
 
   const hasSocials = company.socials && Object.values(company.socials).some(Boolean);
@@ -22,17 +23,51 @@ export const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({ isOpen
         
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
-            <div>
-                 <h2 className="text-xl font-bold text-gray-900">{company.company}</h2>
-                 <div className="flex items-center gap-2 mt-1">
-                     <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 flex items-center gap-1">
-                        <Hash className="h-3 w-3" /> {refId}
-                     </span>
+            <div className="flex items-center gap-4">
+                 {/* Logo Logic */}
+                 <div className="h-12 w-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden relative">
+                    {company.companyImageUrl ? (
+                        <>
+                            <img 
+                                src={company.companyImageUrl} 
+                                alt={company.company} 
+                                className="h-full w-full object-cover" 
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
+                            />
+                            <div className="hidden h-full w-full flex items-center justify-center text-lg font-bold text-gray-400">
+                                {company.company.charAt(0)}
+                            </div>
+                        </>
+                    ) : (
+                        <span className="text-lg font-bold text-gray-400">{company.company.charAt(0)}</span>
+                    )}
+                 </div>
+
+                 <div>
+                     <h2 className="text-xl font-bold text-gray-900 leading-tight">{company.company}</h2>
+                     <div className="flex items-center gap-2 mt-1">
+                         <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 flex items-center gap-1">
+                            <Hash className="h-3 w-3" /> {refId}
+                         </span>
+                     </div>
                  </div>
             </div>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-full transition-colors">
-                <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+                {onEdit && (
+                    <button 
+                        onClick={() => onEdit(company)}
+                        className="px-3 py-1.5 bg-white border border-gray-200 hover:border-brand-300 text-gray-600 hover:text-brand-600 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-colors shadow-sm"
+                    >
+                        <Edit2 className="h-3.5 w-3.5" /> Edit Details
+                    </button>
+                )}
+                <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-full transition-colors">
+                    <X className="h-5 w-5" />
+                </button>
+            </div>
         </div>
 
         <div className="p-6 space-y-6">
@@ -47,13 +82,15 @@ export const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({ isOpen
             </div>
 
             {/* Key Contact */}
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-                    <User className="h-4 w-4" /> Key Contact
-                </h3>
-                <p className="text-gray-900 font-medium text-lg">
-                    {company.contactName || <span className="text-gray-400 italic text-sm">No contact person listed</span>}
-                </p>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                <div>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-2">
+                        <User className="h-4 w-4" /> Key Contact
+                    </h3>
+                    <p className="text-gray-900 font-medium text-lg">
+                        {company.contactName || <span className="text-gray-400 italic text-sm">No contact person listed</span>}
+                    </p>
+                </div>
             </div>
 
             {/* Socials / Online Presence */}

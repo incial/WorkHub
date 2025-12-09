@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Building, Hash, Check, History, HardDrive, Globe, Linkedin, Instagram, Facebook, Twitter, Link as LinkIcon, User } from 'lucide-react';
+import { X, Save, Building, Hash, Check, History, HardDrive, Globe, Linkedin, Instagram, Facebook, Twitter, Link as LinkIcon, User, Image } from 'lucide-react';
 import { CRMEntry, CRMStatus, SocialLinks } from '../../types';
 import { getWorkTypeStyles } from '../../utils';
 
@@ -29,22 +29,8 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
   const [formData, setFormData] = useState<Partial<CRMEntry>>({});
   
   useEffect(() => {
-    if (isOpen) {
-        if (initialData) {
-            setFormData(initialData);
-        } else {
-            // Reset for Create Mode
-            setFormData({
-                company: '',
-                contactName: '',
-                // Default Reference ID logic - just visual here, backend handles logic or we send it
-                referenceId: `REF-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-                work: [],
-                status: 'on progress', // Default to 'on progress' instead of 'not_started'
-                driveLink: '',
-                socials: {}
-            });
-        }
+    if (isOpen && initialData) {
+        setFormData(initialData);
     }
   }, [initialData, isOpen]);
 
@@ -85,7 +71,7 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
         {/* Modal Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-white z-10">
           <h2 className="text-xl font-bold text-gray-800">
-            {initialData ? 'Edit Company' : 'Add New Company'}
+            Edit Company Details
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors">
               <X className="h-5 w-5" />
@@ -129,6 +115,7 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
                     </div>
                 </div>
 
+                {/* Contact Person (Full Width) */}
                 <div className="w-full">
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">Contact Person</label>
                     <div className="relative">
@@ -141,6 +128,16 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
                             placeholder="Primary Contact Name"
                         />
                     </div>
+                </div>
+
+                {/* Company Logo */}
+                <div className="w-full">
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                        <Image className="h-3.5 w-3.5 text-gray-500" /> Company Logo URL
+                    </label>
+                    <input type="url" className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 focus:outline-none" 
+                    placeholder="https://..."
+                    value={formData.companyImageUrl || ''} onChange={e => setFormData({...formData, companyImageUrl: e.target.value})} />
                 </div>
 
                 {/* Status */}
@@ -288,7 +285,7 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
                         Cancel
                     </button>
                     <button type="submit" className="px-5 py-2.5 text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors font-medium flex items-center gap-2 shadow-lg shadow-brand-500/30">
-                        <Save className="h-4 w-4" /> Save Company
+                        <Save className="h-4 w-4" /> Save Changes
                     </button>
                 </div>
             </form>
