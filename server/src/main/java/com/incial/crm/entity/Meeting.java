@@ -43,11 +43,23 @@ public class Meeting {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "last_updated_by", length = 255)
+    private String lastUpdatedBy;
+
+    @Column(name = "last_updated_at")
+    private LocalDateTime lastUpdatedAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        lastUpdatedAt = LocalDateTime.now();
         if (status == null || status.isEmpty()) {
             status = "Scheduled";
         }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        lastUpdatedAt = LocalDateTime.now();
     }
 }
