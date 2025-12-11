@@ -5,6 +5,7 @@ import { Task, TaskPriority, TaskStatus } from '../../types';
 import { CustomDatePicker } from '../ui/CustomDatePicker';
 import { CustomSelect } from '../ui/CustomSelect';
 import { formatDate } from '../../utils';
+import { usersApi } from '../../services/api';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -16,12 +17,32 @@ interface TaskFormProps {
 
 const PRIORITIES: TaskPriority[] = ['Low', 'Medium', 'High'];
 const STATUSES: TaskStatus[] = ['Not Started', 'In Progress', 'In Review', 'Posted', 'Completed'];
-const ASSIGNEES = ['Vallapata', 'John Doe', 'Demo User', 'Admin User', 'Employee User', 'Unassigned'];
 
 export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSubmit, initialData, companyMap }) => {
   const [formData, setFormData] = useState<Partial<Task>>({});
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [assigneeOptions, setAssigneeOptions] = useState<{ label: string; value: string }[]>([
+      { label: "Unassigned", value: "Unassigned" }
+  ]);
+
+  useEffect(() => {
+      const fetchUsers = async () => {
+          try {
+              const users = await usersApi.getAll();
+              const options = [
+                  { label: "Unassigned", value: "Unassigned" },
+                  ...users.map(u => ({ label: u.name, value: u.name }))
+              ];
+              setAssigneeOptions(options);
+          } catch (e) {
+              console.error("Failed to fetch assignees", e);
+          }
+      };
+      if (isOpen) {
+          fetchUsers();
+      }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -223,7 +244,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSubmit, i
                         label="Assignee"
                         value={formData.assignedTo || ''}
                         onChange={(val) => setFormData({...formData, assignedTo: val})}
-                        options={ASSIGNEES.map(a => ({ label: a, value: a }))}
+                        options={assigneeOptions}
                         placeholder="Select Assignee"
                    />
                 </div>

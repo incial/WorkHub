@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { FilterState } from '../../types';
 import { CustomSelect } from '../ui/CustomSelect';
 import { CustomDatePicker } from '../ui/CustomDatePicker';
+import { usersApi } from '../../services/api';
 
 interface CRMFiltersProps {
   filters: FilterState;
@@ -12,6 +13,26 @@ interface CRMFiltersProps {
 }
 
 export const CRMFilters: React.FC<CRMFiltersProps> = ({ filters, setFilters, onRefresh }) => {
+  const [assigneeOptions, setAssigneeOptions] = useState<{ label: string; value: string }[]>([
+      { label: "All Assignees", value: "" }
+  ]);
+
+  useEffect(() => {
+      const fetchUsers = async () => {
+          try {
+              const users = await usersApi.getAll();
+              const options = [
+                  { label: "All Assignees", value: "" },
+                  ...users.map(u => ({ label: u.name, value: u.name }))
+              ];
+              setAssigneeOptions(options);
+          } catch (e) {
+              console.error("Failed to fetch assignees for filters", e);
+          }
+      };
+      fetchUsers();
+  }, []);
+
   const handleChange = (key: keyof FilterState, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -37,15 +58,6 @@ export const CRMFilters: React.FC<CRMFiltersProps> = ({ filters, setFilters, onR
     { label: "Onboarded", value: "onboarded" },
     { label: "Completed", value: "completed" },
     { label: "Drop", value: "drop" },
-  ];
-
-  const assigneeOptions = [
-    { label: "All Assignees", value: "" },
-    { label: "Vallapata", value: "Vallapata" },
-    { label: "John Doe", value: "John Doe" },
-    { label: "Demo User", value: "Demo User" },
-    { label: "Admin User", value: "Admin User" },
-    { label: "Employee User", value: "Employee User" },
   ];
 
   return (

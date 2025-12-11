@@ -20,9 +20,16 @@ public class CrmController {
     private CrmService crmService;
 
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<Map<String, List<CrmEntryDto>>> getAllEntries() {
         return ResponseEntity.ok(crmService.getAllEntries());
+    }
+
+    @GetMapping("/details/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<CrmEntryDto> getCrmDetails(@PathVariable Long id) {
+        CrmEntryDto details = crmService.getCrmDetails(id);
+        return ResponseEntity.ok(details);
     }
 
     @PostMapping("/create")

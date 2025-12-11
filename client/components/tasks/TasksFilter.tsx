@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { TaskFilterState } from '../../types';
 import { CustomSelect } from '../ui/CustomSelect';
+import { usersApi } from '../../services/api';
 
 interface TasksFilterProps {
   filters: TaskFilterState;
@@ -10,6 +11,26 @@ interface TasksFilterProps {
 }
 
 export const TasksFilter: React.FC<TasksFilterProps> = ({ filters, setFilters }) => {
+  const [assigneeOptions, setAssigneeOptions] = useState<{ label: string; value: string }[]>([
+      { label: "All Assignees", value: "" }
+  ]);
+
+  useEffect(() => {
+      const fetchUsers = async () => {
+          try {
+              const users = await usersApi.getAll();
+              const options = [
+                  { label: "All Assignees", value: "" },
+                  ...users.map(u => ({ label: u.name, value: u.name }))
+              ];
+              setAssigneeOptions(options);
+          } catch (e) {
+              console.error("Failed to fetch assignees for filters", e);
+          }
+      };
+      fetchUsers();
+  }, []);
+
   const handleChange = (key: keyof TaskFilterState, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -34,15 +55,6 @@ export const TasksFilter: React.FC<TasksFilterProps> = ({ filters, setFilters })
     { label: "High", value: "High" },
     { label: "Medium", value: "Medium" },
     { label: "Low", value: "Low" },
-  ];
-
-  const assigneeOptions = [
-    { label: "All Assignees", value: "" },
-    { label: "Vallapata", value: "Vallapata" },
-    { label: "John Doe", value: "John Doe" },
-    { label: "Demo User", value: "Demo User" },
-    { label: "Admin User", value: "Admin User" },
-    { label: "Employee User", value: "Employee User" },
   ];
 
   return (

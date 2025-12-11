@@ -4,6 +4,7 @@ import { X, Save, Calendar, User, AlignLeft, Tag, Layers, Flag, Link as LinkIcon
 import { Task, TaskPriority, TaskStatus, TaskType } from '../../types';
 import { formatDate } from '../../utils';
 import { CustomSelect } from '../ui/CustomSelect';
+import { usersApi } from '../../services/api';
 
 interface ClientTaskFormProps {
   isOpen: boolean;
@@ -15,12 +16,26 @@ interface ClientTaskFormProps {
 
 const PRIORITIES: TaskPriority[] = ['Low', 'Medium', 'High'];
 const TYPES: TaskType[] = ['General', 'Reel', 'Post', 'Story', 'Carousel', 'Video'];
-const ASSIGNEES = ['Vallapata', 'John Doe', 'Demo User', 'Admin User', 'Employee User'];
 
 export const ClientTaskForm: React.FC<ClientTaskFormProps> = ({ isOpen, onClose, onSubmit, initialData, companyId }) => {
   const [formData, setFormData] = useState<Partial<Task>>({});
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [assigneeOptions, setAssigneeOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+      const fetchUsers = async () => {
+          try {
+              const users = await usersApi.getAll();
+              setAssigneeOptions(users.map(u => ({ label: u.name, value: u.name })));
+          } catch (e) {
+              console.error("Failed to fetch assignees", e);
+          }
+      };
+      if (isOpen) {
+          fetchUsers();
+      }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -39,7 +54,7 @@ export const ClientTaskForm: React.FC<ClientTaskFormProps> = ({ isOpen, onClose,
           status: 'Not Started',
           priority: 'Medium',
           taskType: 'General',
-          assignedTo: 'Vallapata',
+          assignedTo: '', // Will be selected from dropdown
           dueDate: localIsoDate,
           taskLink: '',
           isVisibleOnMainBoard: false // Default to false
@@ -251,7 +266,8 @@ export const ClientTaskForm: React.FC<ClientTaskFormProps> = ({ isOpen, onClose,
                         label="Assignee"
                         value={formData.assignedTo || ''}
                         onChange={(val) => setFormData({...formData, assignedTo: val})}
-                        options={ASSIGNEES.map(a => ({ label: a, value: a }))}
+                        options={assigneeOptions}
+                        placeholder="Select Assignee"
                     />
                 </div>
 

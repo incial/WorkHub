@@ -31,7 +31,13 @@ export const CompaniesForm: React.FC<CompaniesFormProps> = ({ isOpen, onClose, o
   
   useEffect(() => {
     if (isOpen && initialData) {
-        setFormData(initialData);
+        // If referenceId is missing (it was showing as fallback in table), pre-fill it here
+        const fallbackRefId = `REF-${new Date().getFullYear()}-${String(initialData.id).padStart(3, '0')}`;
+        
+        setFormData({
+            ...initialData,
+            referenceId: initialData.referenceId || fallbackRefId
+        });
     }
   }, [initialData, isOpen]);
 

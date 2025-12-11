@@ -5,6 +5,7 @@ import { CRMEntry, SocialLinks } from '../../types';
 import { getStatusStyles, formatDate, getFollowUpColor, formatMoney } from '../../utils';
 import { CustomDatePicker } from '../ui/CustomDatePicker';
 import { CustomSelect } from '../ui/CustomSelect';
+import { usersApi } from '../../services/api';
 
 interface CRMFormProps {
   isOpen: boolean;
@@ -17,8 +18,6 @@ const LEAD_SOURCES = [
   'Google Business', 'Direct Call', 'Website', 'Referral', 'Social Media', 
   'Email Campaign', 'Cold Call', 'Event', 'Partner', 'Direct Mail'
 ];
-
-const ASSIGNEES = ['Vallapata', 'John Doe', 'Demo User', 'Admin User', 'Employee User'];
 
 const TAG_OPTIONS = [
   { label: 'Lead', color: 'bg-blue-100 text-blue-700 border-blue-200' },
@@ -50,6 +49,22 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
   const [formData, setFormData] = useState<Partial<CRMEntry>>({});
   const [mode, setMode] = useState<'view' | 'edit'>('edit');
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+  const [assigneeOptions, setAssigneeOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    // Fetch users for assignment dropdown
+    const fetchUsers = async () => {
+        try {
+            const users = await usersApi.getAll();
+            setAssigneeOptions(users.map(u => ({ label: u.name, value: u.name })));
+        } catch (e) {
+            console.error("Failed to fetch assignees", e);
+        }
+    };
+    if (isOpen) {
+        fetchUsers();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,7 +79,7 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                 email: '',
                 phone: '',
                 status: 'lead',
-                assignedTo: 'Vallapata',
+                assignedTo: '', // Will be selected from dropdown
                 dealValue: 0,
                 tags: [],
                 work: [],
@@ -172,9 +187,9 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Assigned To</p>
                     <div className="flex items-center gap-2">
                         <div className="h-6 w-6 rounded-full bg-brand-100 flex items-center justify-center text-xs font-bold text-brand-700">
-                            {formData.assignedTo?.[0]}
+                            {formData.assignedTo?.[0] || '?'}
                         </div>
-                        <span className="font-medium text-gray-900">{formData.assignedTo}</span>
+                        <span className="font-medium text-gray-900">{formData.assignedTo || 'Unassigned'}</span>
                     </div>
                 </div>
                 <div>
@@ -558,7 +573,7 @@ export const CRMForm: React.FC<CRMFormProps> = ({ isOpen, onClose, onSubmit, ini
                             label="Assigned To"
                             value={formData.assignedTo || ''}
                             onChange={(val) => setFormData({...formData, assignedTo: val})}
-                            options={ASSIGNEES.map(a => ({ label: a, value: a }))}
+                            options={assigneeOptions}
                             placeholder="Select Assignee"
                         />
                     </div>

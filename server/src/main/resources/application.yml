@@ -40,3 +40,11 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+# ===========================
+# For Envs
+# ===========================
+
+env:
+  printer:
+    enabled: true

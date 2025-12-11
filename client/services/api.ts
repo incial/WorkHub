@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import { CRMEntry, Task, Meeting, AuthResponse } from '../types';
+import { CRMEntry, Task, Meeting, AuthResponse, User } from '../types';
 
 // ============================================================================
 // ⚙️ API CONFIGURATION
@@ -39,6 +39,16 @@ const handleApiError = (error: any) => {
 // ============================================================================
 // 🔌 API ENDPOINTS
 // ============================================================================
+
+// --- USERS API ---
+export const usersApi = {
+  getAll: async (): Promise<User[]> => {
+    try {
+        const res = await api.get("/users/all");
+        return res.data;
+    } catch (error) { throw handleApiError(error); }
+  }
+};
 
 // --- CRM API ---
 export const crmApi = {
