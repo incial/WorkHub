@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Users, Briefcase, Settings, PieChart, ChevronRight, CheckSquare, ListTodo, BarChart2, Calendar, LayoutDashboard, Home, Command } from 'lucide-react';
+import { Users, Briefcase, Settings, PieChart, ChevronRight, CheckSquare, ListTodo, BarChart2, Calendar, LayoutDashboard, Home, Command, Shield } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLayout } from '../../context/LayoutContext';
@@ -65,9 +65,7 @@ export const Sidebar: React.FC = () => {
       <div className={`h-[88px] flex items-center ${isSidebarCollapsed ? 'justify-center' : 'px-8'} transition-all duration-300`}>
         <div className="flex items-center gap-3.5 overflow-hidden whitespace-nowrap group cursor-pointer">
             <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-500/30 transition-all duration-500 ${isSidebarCollapsed ? 'h-10 w-10' : 'h-9 w-9'}`}>
-                <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-500/30 transition-all duration-500 ${isSidebarCollapsed ? 'h-10 w-10' : 'h-9 w-9'}`}>
                 <img src="/logo.png" alt="Incial" className="h-9 w-9 rounded-xl bg-white shadow-lg object-contain p-1 flex-shrink-0" />
-            </div>
             </div>
             
             {!isSidebarCollapsed && (
@@ -131,6 +129,7 @@ export const Sidebar: React.FC = () => {
                 <div className="space-y-0.5">
                     <NavItem collapsed={isSidebarCollapsed} icon={PieChart} label="Reports" to="/reports" active={currentPath === '/reports'} />
                     <NavItem collapsed={isSidebarCollapsed} icon={BarChart2} label="Performance" to="/admin/performance" active={currentPath === '/admin/performance'} />
+                    <NavItem collapsed={isSidebarCollapsed} icon={Shield} label="Users" to="/admin/users" active={currentPath === '/admin/users'} />
                 </div>
             </div>
         )}
