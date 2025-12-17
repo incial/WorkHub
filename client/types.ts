@@ -22,6 +22,13 @@ export interface AuthResponse {
   message: string;
 }
 
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 export interface ApiResponse {
   success: boolean;
   message: string;
@@ -38,7 +45,7 @@ export interface VerifyOtpRequest {
 
 export interface ChangePasswordRequest {
   email: string;
-  newPassword: string; 
+  newPassword: string; // Changed from 'password' to match backend DTO
   otp: string; 
 }
 

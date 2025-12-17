@@ -12,6 +12,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ClientTrackerPage } from './pages/ClientTrackerPage';
 import { ClientDetailsPage } from './pages/ClientDetailsPage';
 import { AdminPerformancePage } from './pages/AdminPerformancePage';
+import { AdminUserManagementPage } from './pages/AdminUserManagementPage';
 import { MeetingTrackerPage } from './pages/MeetingTrackerPage';
 import { UniversalCalendarPage } from './pages/UniversalCalendarPage';
 import { MyDashboardPage } from './pages/MyDashboardPage';
@@ -215,7 +216,7 @@ const AppRoutes = () => {
                     </OperationalRoute>
                 } />
                 
-                {/* Analytics (Super Admin Only) */}
+                {/* Analytics & User Management (Super Admin Only) */}
                 <Route path="/reports" element={
                     <SuperAdminRoute>
                         <AnalyticsPage title="Reports" />
@@ -224,6 +225,11 @@ const AppRoutes = () => {
                  <Route path="/admin/performance" element={
                     <SuperAdminRoute>
                         <AdminPerformancePage />
+                    </SuperAdminRoute>
+                } />
+                <Route path="/admin/users" element={
+                    <SuperAdminRoute>
+                        <AdminUserManagementPage />
                     </SuperAdminRoute>
                 } />
 

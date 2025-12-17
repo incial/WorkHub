@@ -42,4 +42,10 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable  Long id){
+        return ResponseEntity.ok(userService.deleteUser(id));
+    }
 }

@@ -6,10 +6,12 @@ import com.incial.crm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +58,16 @@ public class UserService {
                 .build();
     }
 
+    public Void deleteUser(Long id) {
+
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isPresent()){
+            userRepository.deleteById(id);
+        }
+        return null;
+    }
+
     public static String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -63,5 +75,6 @@ public class UserService {
         }
         return authentication.getName();
     }
+
 
 }
