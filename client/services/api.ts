@@ -109,6 +109,19 @@ export const usersApi = {
         const res = await api.get("/users/all");
         return res.data;
     } catch (error) { throw handleApiError(error); }
+  },
+  
+  update: async (id: number, data: Partial<User>): Promise<User> => {
+    try {
+        const res = await api.put(`/users/update/${id}`, data);
+        return res.data;
+    } catch (error) { throw handleApiError(error); }
+  },
+
+  delete: async (id: number): Promise<void> => {
+    try {
+        await api.delete(`/users/delete/${id}`);
+    } catch (error) { throw handleApiError(error); }
   }
 };
 

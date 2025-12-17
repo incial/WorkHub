@@ -65,7 +65,7 @@ export const Sidebar: React.FC = () => {
       <div className={`h-[88px] flex items-center ${isSidebarCollapsed ? 'justify-center' : 'px-8'} transition-all duration-300`}>
         <div className="flex items-center gap-3.5 overflow-hidden whitespace-nowrap group cursor-pointer">
             <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-500/30 transition-all duration-500 ${isSidebarCollapsed ? 'h-10 w-10' : 'h-9 w-9'}`}>
-                <Command className="h-5 w-5 text-white" />
+                <img src="/logo.png" alt="Incial" className="h-9 w-9 rounded-xl bg-white shadow-lg object-contain p-1 flex-shrink-0" />
             </div>
             
             {!isSidebarCollapsed && (
