@@ -7,40 +7,54 @@ jobs:
     steps:
       - checkout
 
+      # -----------------------------
       # Build Spring Boot JAR
+      # -----------------------------
       - run:
-          name: Build JAR
+          name: Build Backend JAR
           command: |
+            cd server
             mvn clean package -DskipTests
 
-      # Enable Docker
+      # -----------------------------
+      # Enable Docker daemon
+      # -----------------------------
       - setup_remote_docker:
           docker_layer_caching: true
 
+      # -----------------------------
       # Install AWS CLI
+      # -----------------------------
       - run:
           name: Install AWS CLI
           command: |
             sudo apt-get update
             sudo apt-get install -y awscli
 
-      # Login to Amazon ECR
+      # -----------------------------
+      # Login to AWS ECR
+      # -----------------------------
       - run:
           name: Login to Amazon ECR
           command: |
-            aws ecr get-login-password --region $AWS_REGION |
+            aws ecr get-login-password --region $AWS_REGION | \
             docker login \
               --username AWS \
               --password-stdin \
               $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
+      # -----------------------------
       # Build Docker image
+      # -----------------------------
       - run:
           name: Build Docker image
           command: |
+            cd server
             docker build -t $ECR_REPO_NAME:latest .
 
+      # -----------------------------
       # Tag Docker image
+      # -----------------------------
       - run:
           name: Tag Docker image
           command: |
@@ -48,7 +62,9 @@ jobs:
               $ECR_REPO_NAME:latest \
               $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
 
-      # Push Docker image
+      # -----------------------------
+      # Push Docker image to ECR
+      # -----------------------------
       - run:
           name: Push Docker image to ECR
           command: |
