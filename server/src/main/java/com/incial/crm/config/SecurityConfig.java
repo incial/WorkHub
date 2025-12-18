@@ -55,7 +55,7 @@ public class SecurityConfig {
                         )
                         .requestMatchers("/api/v1/tasks/client-tasks").hasAuthority("ROLE_CLIENT")
                         .requestMatchers("/api/v1/tasks/**").hasAnyAuthority(
-                                "ROLE_ADMIN", "ROLE_EMPLOYEE", "ROLE_SUPER_ADMIN"
+                                "ROLE_ADMIN", "ROLE_EMPLOYEE", "ROLE_SUPER_ADMIN", "ROLE_CLIENT"
                         )
                         .requestMatchers("/api/v1/meetings/**").hasAnyAuthority(
                                 "ROLE_ADMIN", "ROLE_EMPLOYEE", "ROLE_SUPER_ADMIN"

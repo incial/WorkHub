@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
-import { X, Save, User, Mail, Lock, Shield } from 'lucide-react';
-import { authApi } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import { X, Save, User, Mail, Lock, Shield, Building } from 'lucide-react';
+import { authApi, crmApi } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { CustomSelect } from '../ui/CustomSelect';
+import { CRMEntry } from '../../types';
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const ROLE_OPTIONS = [
     { label: 'Employee', value: 'ROLE_EMPLOYEE' },
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Super Admin', value: 'ROLE_SUPER_ADMIN' },
+    { label: 'Client', value: 'ROLE_CLIENT' },
 ];
 
 export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onSuccess }) => {
@@ -23,9 +25,17 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
       name: '',
       email: '',
       password: '',
-      role: 'ROLE_EMPLOYEE'
+      role: 'ROLE_EMPLOYEE',
+      clientCrmId: undefined as number | undefined
   });
+  const [crmEntries, setCrmEntries] = useState<CRMEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+        crmApi.getAll().then(data => setCrmEntries(data.crmList)).catch(e => console.error("Failed to load CRM entries", e));
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -34,14 +44,23 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
     setIsLoading(true);
     
     try {
-        await authApi.registerUser(formData);
+        // Strip out clientCrmId if not a client role
+        const payload = {
+            ...formData,
+            role: formData.role.replace('ROLE_', ''), // API expects "CLIENT" not "ROLE_CLIENT"
+            clientCrmId: formData.role === 'ROLE_CLIENT' ? formData.clientCrmId : undefined
+        };
+
+        await authApi.registerUser(payload as any);
         showToast(`User ${formData.name} created successfully`, 'success');
+        
         // Reset form
         setFormData({
             name: '',
             email: '',
             password: '',
-            role: 'ROLE_EMPLOYEE'
+            role: 'ROLE_EMPLOYEE',
+            clientCrmId: undefined
         });
         onSuccess();
         onClose();
@@ -51,6 +70,11 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
         setIsLoading(false);
     }
   };
+
+  const crmOptions = crmEntries.map(entry => ({
+      label: entry.company,
+      value: entry.id.toString()
+  }));
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
@@ -128,11 +152,23 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
                         options={ROLE_OPTIONS}
                         required
                     />
-                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        Assign appropriate permissions.
-                    </p>
                 </div>
+
+                {/* Client Link (Conditional) */}
+                {formData.role === 'ROLE_CLIENT' && (
+                    <div className="animate-in slide-in-from-top-2 duration-300">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 flex items-center gap-2">
+                            <Building className="h-3.5 w-3.5" /> Link to Company <span className="text-red-500">*</span>
+                        </label>
+                        <CustomSelect 
+                            value={formData.clientCrmId?.toString() || ''}
+                            onChange={(val) => setFormData({...formData, clientCrmId: parseInt(val)})}
+                            options={crmOptions}
+                            placeholder="Select CRM Entry..."
+                            required
+                        />
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-50 mt-2">
