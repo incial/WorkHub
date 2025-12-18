@@ -6,17 +6,30 @@ orbs:
 jobs:
   build-and-push:
     docker:
-      - image: cimg/openjdk:21.0
+      - image: cimg/openjdk:17.0
     environment:
       IMAGE_TAG: latest
     steps:
       - checkout
 
+      # Restore Maven cache
+      - restore_cache:
+          keys:
+            - maven-deps-{{ checksum "server/pom.xml" }}
+            - maven-deps-
+
       # Build Spring Boot JAR
       - run:
           name: Build JAR
           command: |
+            cd server
             mvn clean package -DskipTests
+
+      # Save Maven cache
+      - save_cache:
+          key: maven-deps-{{ checksum "server/pom.xml" }}
+          paths:
+            - ~/.m2
 
       # Enable Docker
       - setup_remote_docker:
@@ -43,6 +56,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
+            cd server
             docker build \
               -t $ECR_REPO_NAME:$IMAGE_TAG .
 

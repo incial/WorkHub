@@ -25,6 +25,9 @@ WORKDIR /app
 # Copy the JAR file from build stage
 COPY --from=build /app/target/backend-1.0.0.jar app.jar
 
+# Install curl for health checks (must be done before switching to non-root user)
+RUN apk add --no-cache curl
+
 # Create non-root user for security
 RUN addgroup -S incial && adduser -S incial -G incial
 
@@ -36,9 +39,6 @@ USER incial
 
 # Expose port 8080
 EXPOSE 8080
-
-# Install curl for health checks
-RUN apk add --no-cache curl
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
