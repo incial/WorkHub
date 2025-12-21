@@ -1,9 +1,14 @@
 version: 2.1
 
+orbs:
+  aws-cli: circleci/aws-cli@4.1.2
+
 jobs:
-  build-and-push:
+  build-and-deploy:
     docker:
       - image: cimg/openjdk:17.0
+    environment:
+      IMAGE_TAG: << pipeline.git.revision >>
     steps:
       - checkout
 
@@ -23,13 +28,9 @@ jobs:
           docker_layer_caching: true
 
       # -----------------------------
-      # Install AWS CLI
+      # Setup AWS CLI
       # -----------------------------
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y awscli
+      - aws-cli/setup
 
       # -----------------------------
       # Login to AWS ECR
@@ -37,56 +38,52 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-            aws ecr get-login-password --region $AWS_REGION | \
-            docker login \
-              --username AWS \
-              --password-stdin \
-              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+            aws ecr get-login-password \
+              | docker login \
+                --username AWS \
+                --password-stdin \
+                ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
       # -----------------------------
-      # Build Docker image
+      # Build & Push ARM64 Docker Image
       # -----------------------------
       - run:
-          name: Build Docker image
+          name: Build and Push ARM64 image
           command: |
             cd server
-            docker build -t $ECR_REPO_NAME:latest .
+            docker buildx create --use || true
+
+            docker buildx build \
+              --platform linux/arm64 \
+              -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest \
+              -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${CIRCLE_SHA1:0:7} \
+              --push .
 
       # -----------------------------
-      # Set image tag from Git SHA
+      # Deploy to EC2 via SSM
       # -----------------------------
       - run:
-          name: Set image tag
+          name: Deploy via AWS SSM
           command: |
-            echo "IMAGE_TAG=${CIRCLE_SHA1:0:7}" >> $BASH_ENV
-
-      # -----------------------------
-      # Tag Docker images
-      # -----------------------------
-      - run:
-          name: Tag Docker images
-          command: |
-            docker tag \
-              $ECR_REPO_NAME:latest \
-              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
-
-            docker tag \
-              $ECR_REPO_NAME:latest \
-              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
-
-      # -----------------------------
-      # Push Docker images to ECR
-      # -----------------------------
-      - run:
-          name: Push Docker images to ECR
-          command: |
-            docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
-
-            docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+            aws ssm send-command \
+              --instance-ids ${EC2_INSTANCE_ID} \
+              --document-name "AWS-RunShellScript" \
+              --comment "Deploy backend" \
+              --parameters commands="[
+                \"docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest\",
+                \"docker stop incial-backend || true\",
+                \"docker rm incial-backend || true\",
+                \"docker run -d --name incial-backend \
+                   --env-file /home/ec2-user/incial.env \
+                   --restart unless-stopped \
+                   -p 8080:8080 \
+                   ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest\"
+              ]"
 
 workflows:
-  build:
+  deploy:
     jobs:
-      - build-and-push
+      - build-and-deploy:
+          filters:
+            branches:
+              only: main
