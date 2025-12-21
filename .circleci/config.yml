@@ -63,18 +63,24 @@ jobs:
       # Deploy to EC2 via SSM
       # -----------------------------
       - run:
-          name: Deploy via AWS SSM
+          name: Deploy via AWS SSM 
           command: |
             aws ssm send-command \
+              --region ${AWS_REGION} \
               --instance-ids ${EC2_INSTANCE_ID} \
               --document-name "AWS-RunShellScript" \
-              --comment "Deploy backend" \
-              --parameters commands="[
-                \"docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${CIRCLE_SHA1:0:7}\",
-                \"docker stop incial-backend || true\",
-                \"docker rm incial-backend || true\",
-                \"docker run -d --name incial-backend --env-file /home/ec2-user/incial.env --restart unless-stopped -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${CIRCLE_SHA1:0:7}\"
-              ]"
+              --parameters '{
+                "commands": [
+                  "set -eux",
+                  "whoami",
+                  "docker --version",
+                  "docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${CIRCLE_SHA1:0:7}",
+                  "docker stop incial-backend || true",
+                  "docker rm incial-backend || true",
+                  "docker run -d --name incial-backend --env-file /home/ec2-user/incial.env --restart unless-stopped -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${CIRCLE_SHA1:0:7}",
+                  "docker ps -a"
+                ]
+              }'
 workflows:
   deploy:
     jobs:
