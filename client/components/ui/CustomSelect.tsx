@@ -98,7 +98,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-[1000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top min-w-[180px] ring-1 ring-black/5">
           <div className="max-h-64 overflow-y-auto no-scrollbar p-1.5 space-y-0.5">
             {options.length > 0 ? (
-                // Removed the (allowCustom && value) filter that was hiding valid options
+                // Removed the restrictive filter to ensure all options show initially
                 options.map((option) => (
                 <button
                     key={option.value}

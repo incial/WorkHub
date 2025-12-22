@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Bell, LogOut, ChevronDown, User, Menu, Check, LayoutDashboard, Users, CalendarDays, CheckSquare, Calendar, Briefcase, ListTodo, PieChart, BarChart2, Home, PanelLeft, Gamepad2, Plus, Zap, Settings } from 'lucide-react';
+import { Search, Bell, LogOut, ChevronDown, User, Menu, Check, LayoutDashboard, Users, CalendarDays, CheckSquare, Calendar, Briefcase, ListTodo, PieChart, BarChart2, Home, PanelLeft, Gamepad2, Plus, Zap, Settings, Shield, Inbox } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLayout } from '../../context/LayoutContext';
 
@@ -67,6 +67,7 @@ export const Navbar: React.FC = () => {
     if (currentPath.startsWith('/client-tracker')) return 'Client Projects';
     if (currentPath === '/reports') return 'Analytics Reports';
     if (currentPath === '/admin/performance') return 'Team Performance';
+    if (currentPath === '/admin/users') return 'User Management';
     if (currentPath === '/profile') return 'My Profile';
     if (currentPath === '/break') return 'Focus Break';
     if (currentPath === '/portal') return 'Project Portal';
@@ -154,46 +155,21 @@ export const Navbar: React.FC = () => {
                 className={`relative p-2 rounded-xl transition-all duration-200 ${isNotifOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
             >
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                {/* Notification dot removed as requested */}
             </button>
             
-            {/* Notifications Dropdown */}
+            {/* Notifications Dropdown (Empty state) */}
             {isNotifOpen && (
                 <div className="absolute right-[-60px] md:right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
                     <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                         <h3 className="font-bold text-gray-900">Notifications</h3>
-                        <button className="text-xs font-bold text-brand-600 hover:underline">Mark all read</button>
                     </div>
-                    <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
-                         <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 relative group">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div className="flex gap-3">
-                                <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0 border border-blue-100">
-                                    <Zap className="h-4 w-4" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-900 font-semibold">New lead assigned</p>
-                                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">The system assigned "Acme Corp" to your pipeline.</p>
-                                    <p className="text-[10px] text-gray-400 mt-1.5 font-medium">2 min ago</p>
-                                </div>
-                            </div>
-                         </div>
-                         <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer relative group">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div className="flex gap-3">
-                                <div className="h-9 w-9 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0 border border-green-100">
-                                    <Check className="h-4 w-4" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-900 font-semibold">Task Completed</p>
-                                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">"Website Redesign" marked as done by Sarah.</p>
-                                    <p className="text-[10px] text-gray-400 mt-1.5 font-medium">1 hour ago</p>
-                                </div>
-                            </div>
-                         </div>
-                    </div>
-                    <div className="p-3 border-t border-gray-50 bg-gray-50/50 text-center">
-                        <button className="text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors">View All Activity</button>
+                    <div className="p-10 flex flex-col items-center justify-center text-center">
+                        <div className="h-16 w-16 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 mb-4 border border-gray-100">
+                            <Inbox className="h-8 w-8" />
+                        </div>
+                        <p className="text-xs font-bold text-gray-900 uppercase tracking-widest">Inbox Clean</p>
+                        <p className="text-[10px] text-gray-500 mt-2">No new updates at this time.</p>
                     </div>
                 </div>
             )}
@@ -247,19 +223,6 @@ export const Navbar: React.FC = () => {
                                 </div>
                                 My Profile
                             </Link>
-                            
-                            {isSuperAdmin && (
-                                <Link 
-                                    to="/settings" 
-                                    onClick={() => setIsProfileOpen(false)} 
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors group"
-                                >
-                                    <div className="p-1.5 rounded-lg bg-gray-100 text-gray-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-                                        <Settings className="h-4 w-4" />
-                                    </div>
-                                    Settings
-                                </Link>
-                            )}
 
                             <Link 
                                 to="/break" 
@@ -317,8 +280,9 @@ export const Navbar: React.FC = () => {
                 <>
                     <div className="my-2 border-t border-gray-100" />
                     <div className="mb-2 px-2 mt-2">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Analytics</p>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Administration</p>
                     </div>
+                    <MobileNavItem to="/admin/users" icon={Shield} label="User Management" active={currentPath === '/admin/users'} />
                     <MobileNavItem to="/reports" icon={PieChart} label="Reports" active={currentPath === '/reports'} />
                     <MobileNavItem to="/admin/performance" icon={BarChart2} label="Team Performance" active={currentPath === '/admin/performance'} />
                 </>
