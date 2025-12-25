@@ -155,7 +155,6 @@ export interface MeetingFilterState {
   dateRangeStart: string;
 }
 
-// Added Invoice types to fix Module '../types' has no exported member errors
 export type InvoiceStatus = 'Draft' | 'Pending' | 'Paid' | 'Overdue';
 
 export interface InvoiceItem {
@@ -183,3 +182,14 @@ export interface Invoice {
   lastUpdatedBy?: string;
   lastUpdatedAt?: string;
 }
+
+export type CalendarItem = {
+    id: string; 
+    dateStr: string; 
+    sortTime: number; 
+    title: string;
+    type: 'task' | 'meeting';
+    data: Task | Meeting;
+    status: string;
+    priority?: string; 
+};
