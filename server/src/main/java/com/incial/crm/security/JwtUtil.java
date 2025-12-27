@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 24 * 7; // 7 days
+    private static final long EXPIRATION_TIME = 1000 * 60 * 24 * 2; // 2 days
     private SecretKey key;
 
     @Value("${jwt.secret}")
@@ -27,7 +27,7 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 🔥 TOKEN GENERATES USING USERNAME ONLY
+    //  TOKEN GENERATES USING USERNAME ONLY
     public String generateToken(String username){
         return Jwts.builder()
                 .subject(username)
